@@ -9,6 +9,7 @@
   :root{
     --ink:#141a2b; --ink2:#1d2438; --panel:#232c44; --paper:#f6f2e9; --line:#38425f;
     --b0:#ce1e4e; --b1:#45a9d6; --b2:#3e9e3e; --b3:#7e3193; --b4:#e1912f; --b5:#2e74c0;
+    --gray:#8c8c8c;
     --good:#7ee787; --bad:#ff7a8a; --wire:#f6c453;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -153,9 +154,9 @@
     <h1>意味順ゲームズ</h1>
     <div class="wordmark">imijun games</div>
     <div class="track6">
-      <span style="background:var(--b0)">だれが</span><span style="background:var(--b1)">する・です</span>
-      <span style="background:var(--b2)">だれ</span><span style="background:var(--b3)">なに</span>
-      <span style="background:var(--b4)">どこ</span><span style="background:var(--b5)">いつ</span>
+      <span style="background:var(--b1)">だれが</span><span style="background:var(--gray)">頻度</span>
+      <span style="background:var(--b0)">する・です</span><span style="background:var(--b2)">だれ・なに</span>
+      <span style="background:var(--gray)">どこ／どのように／その他</span><span style="background:var(--gray)">いつ</span>
     </div>
     <p>3つのモードで、英語の語順を組み立てる練習を。</p>
   </div>
@@ -249,9 +250,9 @@
     <div class="lbl">この意味の順に、カードをなぞってつなごう</div>
     <div class="jp" id="t-jp">—</div>
     <div class="legend">
-      <span style="background:var(--b0)">だれが</span><span style="background:var(--b1)">する・です</span>
-      <span style="background:var(--b2)">だれ</span><span style="background:var(--b3)">なに</span>
-      <span style="background:var(--b4)">どこ</span><span style="background:var(--b5)">いつ</span>
+      <span style="background:var(--b1)">だれが</span><span style="background:var(--gray)">頻度</span>
+      <span style="background:var(--b0)">する・です</span><span style="background:var(--b2)">だれ・なに</span>
+      <span style="background:var(--gray)">どこ／どのように／その他</span><span style="background:var(--gray)">いつ</span>
     </div>
   </div>
   <div id="t-field">
@@ -263,8 +264,8 @@
 <script>
 /* ================= shared ================= */
 const $ = s=>document.querySelector(s);
-const BOXES=[{name:"だれが",v:"--b0"},{name:"する・です",v:"--b1"},{name:"だれ",v:"--b2"},
-             {name:"なに",v:"--b3"},{name:"どこ",v:"--b4"},{name:"いつ",v:"--b5"}];
+const BOXES=[{name:"だれが",v:"--b1"},{name:"頻度",v:"--gray"},{name:"する・です",v:"--b0"},
+             {name:"だれ・なに",v:"--b2"},{name:"どこ／どのように／その他",v:"--gray"},{name:"いつ",v:"--gray"}];
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
 const eqArr=(a,b)=>a.length===b.length&&a.every((x,i)=>x===b[i]);
 const livesHTML=n=>"♥".repeat(n).replace(/♥/g,"<span style='color:var(--bad)'>♥</span>")
@@ -285,22 +286,81 @@ function goHome(){ DROP.stop(); BUILD.stop(); THREAD.stop(); show("#home"); }
 /* ================= DROP (②) ================= */
 const DROP=(function(){
   const BANK=[
-    {jp:"私は英語を勉強します。",   c:[["I",0],["study",1],["English",3]]},
-    {jp:"彼は本を読みます。",       c:[["He",0],["reads",1],["a book",3]]},
-    {jp:"私たちはサッカーをします。",c:[["We",0],["play",1],["soccer",3]]},
-    {jp:"彼女は音楽が好きです。",   c:[["She",0],["likes",1],["music",3]]},
-    {jp:"私はコーヒーを飲みます。", c:[["I",0],["drink",1],["coffee",3]]},
-    {jp:"その犬はボールが好きです。",c:[["The dog",0],["likes",1],["the ball",3]]},
-    {jp:"私は公園で走ります。",     c:[["I",0],["run",1],["in the park",4]]},
-    {jp:"彼らは学校で勉強します。", c:[["They",0],["study",1],["at school",4]]},
-    {jp:"私は図書館で本を読みます。",c:[["I",0],["read",1],["a book",3],["in the library",4]]},
-    {jp:"彼女は台所で料理をします。",c:[["She",0],["cooks",1],["in the kitchen",4]]},
-    {jp:"私は毎朝走ります。",       c:[["I",0],["run",1],["every morning",5]]},
-    {jp:"彼は日曜日に野球をします。",c:[["He",0],["plays",1],["baseball",3],["on Sunday",5]]},
-    {jp:"私は毎晩公園を歩きます。", c:[["I",0],["walk",1],["in the park",4],["every evening",5]]},
-    {jp:"私たちは夏に海へ行きます。",c:[["We",0],["go",1],["to the sea",4],["in summer",5]]},
-    {jp:"彼らは毎日学校で私に英語を教えます。",
-       c:[["They",0],["teach",1],["me",2],["English",3],["at school",4],["every day",5]]},
+    {jp:"私は生徒です。", c:[["I",0],["am",2],["a student.",3]]},
+    {jp:"あなたは生徒です。", c:[["You",0],["are",2],["a student.",3]]},
+    {jp:"彼は日本出身の生徒です。", c:[["He",0],["is",2],["a student.",3],["from Japan",4]]},
+    {jp:"彼女は幸せです。", c:[["She",0],["is",2],["happy.",3]]},
+    {jp:"私たちは友達です。", c:[["We",0],["are",2],["friends.",3]]},
+    {jp:"彼らは忙しいです。", c:[["They",0],["are",2],["busy.",3]]},
+    {jp:"私は元気です。", c:[["I",0],["am",2],["fine.",3]]},
+    {jp:"あなたは上手な歌手です。", c:[["You",0],["are",2],["a good singer.",3]]},
+    {jp:"彼は先生です。", c:[["He",0],["is",2],["a teacher.",3]]},
+    {jp:"彼女は背が高いです。", c:[["She",0],["is",2],["tall.",3]]},
+    {jp:"私たちは同じクラスの生徒です。", c:[["We",0],["are",2],["students.",3],["in the same class",4]]},
+    {jp:"彼らはとても親切です。", c:[["They",0],["are",2],["very kind.",3]]},
+    {jp:"私はお腹がすいています。", c:[["I",0],["am",2],["hungry.",3]]},
+    {jp:"彼は家にいます。", c:[["He",0],["is",2],["at home.",4]]},
+    {jp:"彼女は料理が上手です。", c:[["She",0],["is",2],["a good cook.",3]]},
+    {jp:"私たちは数学が得意です。", c:[["We",0],["are",2],["good at math.",3]]},
+    {jp:"彼らは遅れています。", c:[["They",0],["are",2],["late.",3]]},
+    {jp:"私は忙しくありません。", c:[["I",0],["am not",2],["busy.",3]]},
+    {jp:"あなたは疲れていません。", c:[["You",0],["are not",2],["tired.",3]]},
+    {jp:"彼は幸せではありません。", c:[["He",0],["is not",2],["happy.",3]]},
+    {jp:"彼女は家にいません。", c:[["She",0],["is not",2],["at home.",3]]},
+    {jp:"私たちは教室にいません。", c:[["We",0],["are not",2],["in the classroom.",4]]},
+    {jp:"彼らは私の友達ではありません。", c:[["They",0],["are not",2],["my friends.",3]]},
+    {jp:"私は先生ではありません。", c:[["I",0],["am not",2],["a teacher.",3]]},
+    {jp:"あなたは準備ができていません。", c:[["You",0],["aren't",2],["ready.",3]]},
+    {jp:"私はサッカーをします。", c:[["I",0],["play",2],["soccer.",3]]},
+    {jp:"あなたはテニスをします。", c:[["You",0],["play",2],["tennis.",3]]},
+    {jp:"彼は野球をします。", c:[["He",0],["plays",2],["baseball.",3]]},
+    {jp:"彼女はピアノを弾きます。", c:[["She",0],["plays",2],["the piano.",3]]},
+    {jp:"私たちは英語を勉強します。", c:[["We",0],["study",2],["English.",3]]},
+    {jp:"彼らは数学を勉強します。", c:[["They",0],["study",2],["math.",3]]},
+    {jp:"私は音楽が好きです。", c:[["I",0],["like",2],["music.",3]]},
+    {jp:"あなたは犬が好きです。", c:[["You",0],["like",2],["dogs.",3]]},
+    {jp:"彼は猫が好きです。", c:[["He",0],["likes",2],["cats.",3]]},
+    {jp:"彼女は本が好きです。", c:[["She",0],["likes",2],["books.",3]]},
+    {jp:"私たちはテレビを見ます。", c:[["We",0],["watch",2],["TV.",3]]},
+    {jp:"彼らはYouTubeを見ます。", c:[["They",0],["watch",2],["YouTube.",3]]},
+    {jp:"私は本を読みます。", c:[["I",0],["read",2],["books.",3]]},
+    {jp:"あなたは漫画を読みます。", c:[["You",0],["read",2],["comics.",3]]},
+    {jp:"彼は新聞を読みます。", c:[["He",0],["reads",2],["newspapers.",3]]},
+    {jp:"彼女は朝ごはんを食べます。", c:[["She",0],["eats",2],["breakfast.",3]]},
+    {jp:"私たちは昼ごはんを食べます。", c:[["We",0],["eat",2],["lunch.",3]]},
+    {jp:"彼らは夕食を食べます。", c:[["They",0],["eat",2],["dinner.",3]]},
+    {jp:"私はいつも英語を勉強します。", c:[["I",0],["always",1],["study",2],["English.",3]]},
+    {jp:"あなたはたいていサッカーをします。", c:[["You",0],["usually",1],["play",2],["soccer.",3]]},
+    {jp:"彼はよくテレビを見ます。", c:[["He",0],["often",1],["watches",2],["TV.",3]]},
+    {jp:"彼女はときどき本を読みます。", c:[["She",0],["sometimes",1],["reads",2],["books.",3]]},
+    {jp:"私たちは毎週日曜日にテニスをします。", c:[["We",0],["play",2],["tennis.",3],["every Sunday.",5]]},
+    {jp:"彼らは学校で英語を勉強します。", c:[["They",0],["study",2],["English.",3],["at school.",4]]},
+    {jp:"私は野球をしません。", c:[["I",0],["don't play",2],["baseball.",3]]},
+    {jp:"私は数学が好きではありません。", c:[["I",0],["don't like",2],["math.",3]]},
+    {jp:"あなたはテニスをしません。", c:[["You",0],["don't play",2],["tennis.",3]]},
+    {jp:"私たちはテレビを見ません。", c:[["We",0],["don't watch",2],["TV.",3]]},
+    {jp:"彼らは英語を勉強しません。", c:[["They",0],["don't study",2],["English.",3]]},
+    {jp:"私はにんじんを食べません。", c:[["I",0],["don't eat",2],["carrots.",3]]},
+    {jp:"私は毎朝朝ごはんを食べます。", c:[["I",0],["eat",2],["breakfast.",3],["every morning.",5]]},
+    {jp:"あなたはたいてい公園で野球をします。", c:[["You",0],["usually",1],["play",2],["baseball.",3],["at the park.",4]]},
+    {jp:"私たちはよく図書館で本を読みます。", c:[["We",0],["often",1],["read",2],["books.",3],["in the library.",4]]},
+    {jp:"彼らはときどき家で英語を勉強します。", c:[["They",0],["sometimes",1],["study",2],["English.",3],["at home.",4]]},
+    {jp:"私はいつも学校でサッカーをします。", c:[["I",0],["always",1],["play",2],["soccer.",3],["at school.",4]]},
+    {jp:"あなたはたいてい夕食後にテレビを見ます。", c:[["You",0],["usually",1],["watch",2],["TV.",3],["after dinner.",5]]},
+    {jp:"私たちはよく教室で音楽を聞きます。", c:[["We",0],["often",1],["listen to",2],["music.",3],["in the classroom.",4]]},
+    {jp:"彼らはときどき家でお母さんを手伝います。", c:[["They",0],["sometimes",1],["help",2],["their mother.",3],["at home.",4]]},
+    {jp:"私はいつも6時に起きます。", c:[["I",0],["always",1],["get up",2],["at six.",5]]},
+    {jp:"あなたはたいていバスで学校へ行きます。", c:[["You",0],["usually",1],["go",2],["to school by bus.",4]]},
+    {jp:"私たちは日曜日に野球をしません。", c:[["We",0],["don't play",2],["baseball.",3],["on Sunday.",5]]},
+    {jp:"彼らは夜にYouTubeを見ません。", c:[["They",0],["don't watch",2],["YouTube.",3],["at night.",5]]},
+    {jp:"私はいつも放課後に宿題をします。", c:[["I",0],["always",1],["do",2],["my homework.",3],["after school.",5]]},
+    {jp:"あなたはたいてい土曜日に部屋を掃除します。", c:[["You",0],["usually",1],["clean",2],["your room.",3],["on Saturday.",5]]},
+    {jp:"私たちはよく先生を手伝います。", c:[["We",0],["often",1],["help",2],["our teacher.",3]]},
+    {jp:"彼らはときどき夕食を作ります。", c:[["They",0],["sometimes",1],["cook",2],["dinner.",3]]},
+    {jp:"私はいつも英語を楽しみます。", c:[["I",0],["always",1],["enjoy",2],["English.",3]]},
+    {jp:"あなたはよく学校でテニスを練習します。", c:[["You",0],["often",1],["practice",2],["tennis.",3],["at school.",4]]},
+    {jp:"私たちは夕食前に漫画を読みません。", c:[["We",0],["don't read",2],["comics.",3],["before dinner.",5]]},
+    {jp:"彼らはたいてい放課後にテレビを見ません。", c:[["They",0],["usually",1],["don't watch",2],["TV.",3],["after school.",5]]},
   ];
   const field=$("#d-field"), boxesEl=$("#d-boxes");
   let boxEls=[], lives,score,level,cleared,combo,active,queue,placed,current,running,raf,lastT;
@@ -311,7 +371,7 @@ const DROP=(function(){
       el.className="box"; el.style.setProperty("--bx",`var(${b.v})`);
       el.innerHTML=`<span class="key">${i+1}</span><div class="name">${b.name}</div><div class="slot"></div>`;
       el.addEventListener("click",()=>tryPlace(i)); boxesEl.appendChild(el); return el; }); }
-  const activeBoxes=()=> level<=1?[0,1,3] : level===2?[0,1,3,4] : level===3?[0,1,2,3,4] : [0,1,2,3,4,5];
+  const activeBoxes=()=> level<=1?[0,2,3] : level===2?[0,1,2,3] : level===3?[0,1,2,3,4] : [0,1,2,3,4,5];
   function refreshBoxes(){ active=activeBoxes(); boxEls.forEach((el,i)=>el.classList.toggle("hide",!active.includes(i))); }
   const fallDur=()=>Math.max(1900, 4600-(level-1)*500);
   function hud(){ $("#d-lv").textContent=level; $("#d-score").textContent=score; $("#d-lives").innerHTML=livesHTML(lives);
@@ -355,7 +415,7 @@ const DROP=(function(){
 
   document.addEventListener("keydown",e=>{ if(!running)return; const n=parseInt(e.key,10);
     if(n>=1&&n<=6&&active.includes(n-1)) tryPlace(n-1); });
-  buildBoxes(); active=[0,1,3];
+  buildBoxes(); active=[0,2,3];
   $("#d-again").onclick=start; $("#d-menu").onclick=goHome; $("#d-home").onclick=goHome;
   return { start, stop };
 })();
